@@ -217,7 +217,7 @@ async function loadPage() {
     });
     ELEMENTS.pageScroll.scrollTop = 0;
     updateScrollbarPadding();
-    document.title = `sMaptic - ${page.title}`;
+    // document.title = `sMaptic - ${page.title}`;
   } catch (error) {
     ELEMENTS.content.innerHTML = `<p>${error.message}</p>`;
   }
