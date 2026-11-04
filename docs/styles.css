@@ -164,6 +164,20 @@ main a:hover {
   color: var(--text-primary);
 }
 
+main a.navigation-link {
+  display: inline-block;
+  margin-inline: 4px;
+  padding: 2px 10px;
+  border: 1px solid var(--border-control);
+  color: var(--text-primary);
+  background: var(--control-background);
+  text-decoration: none;
+}
+
+main a.navigation-link:hover {
+  background: var(--hover-background);
+}
+
 main img {
   max-width: 100%;
   height: auto;
@@ -210,4 +224,34 @@ main td {
 
 .content-loading {
   color: var(--text-secondary);
+}
+
+.page-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  flex: 0 0 auto;
+}
+
+.page-navigation button {
+  padding: 6px 10px;
+  border: 1px solid var(--border-control);
+  text-decoration: none;
+  color: var(--text-primary);
+  background: var(--control-background);
+  font: inherit;
+  cursor: pointer;
+}
+
+.page-navigation button:hover:not(:disabled) {
+  background: var(--hover-background);
+}
+
+.page-navigation button:disabled {
+  color: var(--text-secondary);
+  border-color: var(--border-light);
+  background: var(--control-background);
+  opacity: 0.45;
+  cursor: default;
 }

@@ -1,7 +1,9 @@
 const ELEMENTS = {
   themeToggle: document.querySelector("#theme-toggle"),
   pageScroll: document.querySelector(".page-scroll"),
-  content: document.querySelector("main")
+  content: document.querySelector("main[aria-label='Content']"),
+  previousPage: document.querySelector("#previous-page"),
+  nextPage: document.querySelector("#next-page")
 }
 
 const THEME_STORAGE_KEY = "theme";
@@ -121,6 +123,22 @@ async function initializePageIndex() {
     console.warn(error.message, " - using docs.json fallback");
     await loadFromStaticList();
   }
+
+  // keep the navigation page first in the page index
+  const navigationPage = PAGE_INDEX.get(DEFAULT_PAGE.replace(/\.md$/i, "").toLowerCase());
+  if (!navigationPage) {
+    return;
+  }
+
+  const orderedPages = [
+    navigationPage,
+    ...[...PAGE_INDEX.values()].filter((page) => page !== navigationPage)
+  ];
+
+  PAGE_INDEX.clear();
+  for (const page of orderedPages) {
+    PAGE_INDEX.set(page.title.toLowerCase(), page);
+  }
 }
 
 
@@ -170,6 +188,25 @@ function getAssetUrl(filename) {
 }
 
 
+// update the previous and next buttons based on the active page in the page index
+function updatePageNavigation(activePage) {
+  const pages = [...PAGE_INDEX.values()];
+  const activeIndex = pages.findIndex((page) => page.path === activePage.path);
+  const previousPage = activeIndex > 0 ? pages[activeIndex - 1] : null;
+  const nextPage = activeIndex >= 0 && activeIndex < pages.length - 1 ? pages[activeIndex + 1] : null;
+
+  ELEMENTS.previousPage.disabled = !previousPage;
+  ELEMENTS.nextPage.disabled = !nextPage;
+
+  ELEMENTS.previousPage.onclick = previousPage
+    ? () => { location.hash = `/${encodeURIComponent(previousPage.path).replace(/%2F/g, "/")}`; }
+    : null;
+  ELEMENTS.nextPage.onclick = nextPage
+    ? () => { location.hash = `/${encodeURIComponent(nextPage.path).replace(/%2F/g, "/")}`; }
+    : null;
+}
+
+
 // load active documentaion page in the fragment identifier
 async function loadPage() {
   if (!PAGE_INDEX.size) {
@@ -186,9 +223,12 @@ async function loadPage() {
 
   if (!page) {
     ELEMENTS.content.innerHTML = "<p>Documentation page not found.</p>";
+    ELEMENTS.previousPage.disabled = true;
+    ELEMENTS.nextPage.disabled = true;
     return;
   }
 
+  updatePageNavigation(page);
   ELEMENTS.content.innerHTML = '<p class="content-loading">Loading documentation...</p>';
 
   try {
@@ -207,6 +247,11 @@ async function loadPage() {
     // internal links refresh and load new page, external links open in new tab
     ELEMENTS.content.querySelectorAll("a").forEach((link) => {
       if (link.getAttribute("href")?.startsWith("#/")) {
+        const navigationPage = PAGE_INDEX.get(DEFAULT_PAGE.replace(/\.md$/i, "").toLowerCase());
+        if (link.getAttribute("href") === (navigationPage ? `#/${encodeURIComponent(navigationPage.path)}` : null)) {
+          link.classList.add("navigation-link");
+        }
+
         link.addEventListener("click", () => {
           ELEMENTS.pageScroll.scrollTop = 0;
         });
