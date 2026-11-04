@@ -98,7 +98,7 @@ async function loadFromGitHubContents() {
 
 // clear assets and load from docs.json in the event that contents api fails. useful for testing
 async function loadFromStaticList() {
-  assetBaseUrl = "../assets/";
+  assetBaseUrl = "https://raw.githubusercontent.com/sMaptic/Documentation/main/assets/";
   ASSET_INDEX.clear();
   const response = await fetch("./docs.json");
   if (!response.ok) {
@@ -108,7 +108,7 @@ async function loadFromStaticList() {
   const paths = await response.json();
   for (const path of paths) {
     const title = path.split("/").pop().replace(/\.md$/i, "");
-    const downloadUrl = `../contents/${path.split("/").map(encodeURIComponent).join("/")}`;
+    const downloadUrl = `https://raw.githubusercontent.com/sMaptic/Documentation/main/contents/${path.split("/").map(encodeURIComponent).join("/")}`;
     addPageToIndex(title, path, downloadUrl);
   }
 }
