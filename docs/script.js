@@ -22,8 +22,13 @@ function setTheme(theme) {
   ELEMENTS.themeToggle.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
 }
 
-const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-setTheme(storedTheme === "dark" || storedTheme === "light" ? storedTheme : SYSTEM_THEME);
+function syncThemeFromStorage() {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  setTheme(storedTheme === "dark" || storedTheme === "light" ? storedTheme : SYSTEM_THEME);
+}
+
+syncThemeFromStorage();
+window.addEventListener("pageshow", syncThemeFromStorage);
 
 
 // listen for theme button clicked and toggle theme
